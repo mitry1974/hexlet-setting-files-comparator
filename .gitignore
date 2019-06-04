@@ -1,0 +1,7 @@
+/node_modules/
+/dist/
+*.log
+dist
+.tern-port
+launch.json
+.idea
