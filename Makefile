@@ -2,11 +2,8 @@
 install:
 	npm install
 
-startCalc:
-	npx babel-node src/bin/brain-calc.js
-
-startEven:
-	npx babel-node src/bin/brain-even.js
+publish:
+	npm publish --dry-run
 
 lint:
 	eslint .
