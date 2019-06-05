@@ -1,16 +1,16 @@
 #!/usr/bin/env node
+import program from 'commander';
 import { version, description } from '../../package.json';
 import generateDifference from '../engine';
 
-const commander = require('commander');
-
-const program = new commander.Command();
-
 program
+  .version(version, '-V, --version')
   .description(description)
   .arguments('<firstConfig> <secondConfig>')
-  .version(version)
   .option('-f, --format [type]', '  Output format')
-  .action(generateDifference('data'));
+  .action(generateDifference('data'))
+  .parse(process.argv);
 
-program.parse(process.argv);
+if (program.format) {
+  console.log('format');
+}
