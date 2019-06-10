@@ -3,6 +3,7 @@ import path from 'path';
 import { getParser } from './parsesrs/parsers';
 import './parsesrs/json';
 import './parsesrs/yaml';
+import './parsesrs/ini';
 
 export default (filePath1, filePath2) => {
   const prefix = path.extname(filePath1);
