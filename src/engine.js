@@ -1,31 +1,16 @@
 import fs from 'fs';
-
-const createDiffString = (sign, key, value) => `  ${sign} ${key}: ${value}`;
+import path from 'path';
+import { getParser } from './parsesrs/parsers';
+import './parsesrs/json';
+import './parsesrs/yaml';
 
 export default (filePath1, filePath2) => {
-  const objectBefore = JSON.parse(fs.readFileSync(filePath1), 'utf-8');
-  const objectAfter = JSON.parse(fs.readFileSync(filePath2), 'utf-8');
-  const beforeKeys = Object.keys(objectBefore);
-  const afterKeys = Object.keys(objectAfter);
-  const diffArray = beforeKeys.reduce((acc, key) => {
-    const valueBefore = objectBefore[key];
-    if (key in objectAfter) {
-      const valueAfter = objectAfter[key];
-      if (valueBefore === valueAfter) {
-        return [...acc, createDiffString(' ', key, valueBefore)];
-      }
-      return [...acc, createDiffString('+', key, valueAfter), createDiffString('-', key, valueBefore)];
-    }
-    return [...acc, createDiffString('-', key, valueBefore)];
-  }, []);
+  const prefix = path.extname(filePath1);
+  const parser = getParser(prefix);
 
-  const finalArray = afterKeys.reduce((acc, key) => {
-    if (!(key in objectBefore)) {
-      const valueAfter = objectAfter[key];
-      return [...acc, createDiffString('+', key, valueAfter)];
-    }
-    return acc;
-  }, diffArray);
+  const dataBefore = fs.readFileSync(filePath1, 'utf8');
+  const dataAfter = fs.readFileSync(filePath2, 'utf8');
+  const finalArray = parser(dataBefore, dataAfter);
 
   return `{\n${finalArray.join('\n')}\n}`;
 };
