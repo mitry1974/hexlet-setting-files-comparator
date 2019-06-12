@@ -24,4 +24,11 @@ const parseJsonObjects = (objectBefore, objectAfter) => {
   }, diffArray);
 };
 
-export default parseJsonObjects;
+const parseObjects = parse => (dataBefore, dataAfter) => {
+  const objectBefore = parse(dataBefore, 'utf-8');
+  const objectAfter = parse(dataAfter, 'utf-8');
+
+  return parseJsonObjects(objectBefore, objectAfter);
+};
+
+export default parseObjects;

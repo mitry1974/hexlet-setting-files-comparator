@@ -1,13 +1,6 @@
 import { addParser } from './parsers';
-import parseJsonObjects from './utils';
+import parseObjects from './utils';
 
 const prefix = '.json';
 
-const parse = (dataBefore, dataAfter) => {
-  const objectBefore = JSON.parse(dataBefore, 'utf-8');
-  const objectAfter = JSON.parse(dataAfter, 'utf-8');
-
-  return parseJsonObjects(objectBefore, objectAfter);
-};
-
-addParser(prefix, parse);
+addParser(prefix, parseObjects(JSON.parse));
