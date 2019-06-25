@@ -11,6 +11,7 @@ const getParser = prefix => parsers[prefix];
 const diffOperations = [
   {
     check: (arg1, arg2) => _.isObject(arg1) && _.isObject(arg2),
+    // eslint-disable-next-line no-use-before-define
     getOperation: (key, object1, object2) => [({ nodeType: 'group', key, children: getDiffLines(object1, object2) })],
   },
   {
