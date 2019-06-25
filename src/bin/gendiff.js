@@ -7,10 +7,8 @@ program
   .version(version, '-V, --version')
   .description(description)
   .arguments('<firstConfig> <secondConfig>')
-  .option('-f, --format [type]', '  Output format')
-  .action((firstConfig, secondConfig) => console.log(generateDifference(firstConfig, secondConfig)))
+  .option('-f, --format [type]', '  Output format', 'simple')
+  .action((firstConfig, secondConfig) => console.log(
+    generateDifference(firstConfig, secondConfig, program.format),
+  ))
   .parse(process.argv);
-
-if (program.format) {
-  console.log('format');
-}
