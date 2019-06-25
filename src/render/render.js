@@ -1,26 +1,25 @@
 import { identity } from 'lodash';
 
-const renders = {};
+const formatters = {};
 
-const addRender = (prefix, render) => {
-  renders[prefix] = render;
+const addFormatterData = (prefix, formatterData) => {
+  formatters[prefix] = formatterData;
 };
 
-const getRender = prefix => renders[prefix];
+const getFormatterData = prefix => formatters[prefix];
 
-const render = getRenderData => (parcedData) => {
-  const renderData = getRenderData();
+const render = (formatterData, parcedData) => {
   const iter = (depth, data) => {
     const mapped = data.map((node) => {
       const { children = [] } = node;
       const renderedChildren = children.length > 0 ? iter(depth + 1, children) : '';
-      return `${renderData.render(depth, node, renderedChildren)}`;
+      return `${formatterData.format(depth, node, renderedChildren)}`;
     });
 
     return `${mapped.join('')}`;
   };
 
-  return `${renderData.startElement}${iter(1, parcedData)}\n${renderData.endElement}`;
+  return `${formatterData.startElement}${iter(1, parcedData)}\n${formatterData.endElement}`;
 };
 
 const propertyActions = [
@@ -46,5 +45,5 @@ const stringify = (obj) => {
 };
 
 export {
-  addRender, getRender, render, stringify,
+  addFormatterData, getFormatterData, render, stringify,
 };

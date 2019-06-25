@@ -1,4 +1,4 @@
-import { addRender, render, stringify } from './render';
+import { addFormatterData, stringify } from '../render/render';
 
 const prefix = 'simple';
 const indentationStep = '  ';
@@ -26,34 +26,34 @@ const getNodeSign = arg => nodeSigns.find(({ check }) => check(arg));
 
 const getIndent = depth => indentationStep.repeat(2 * (depth) - 1);
 
-const buildNodeFirstPart = (diffOp, key, depth) => {
+const formatNodeFirstPart = (diffOp, key, depth) => {
   const { sign } = getNodeSign(diffOp);
   return `${getIndent(depth)}${sign} ${key}: `;
 };
 
-const buildSimpleNodeInternal = (diffOp, key, value, depth) => (
+const formatSimpleNodeInternal = (diffOp, key, value, depth) => (
   value.lenght === 0
     ? ''
-    : `${buildNodeFirstPart(diffOp, key, depth)}${stringify(value)}`
+    : `${formatNodeFirstPart(diffOp, key, depth)}${stringify(value)}`
 );
 
-const buildChangedNode = (node, depth) => {
+const formatChangedNode = (node, depth) => {
   const {
     key,
     oldValue = '',
     newValue = '',
   } = node;
 
-  return `${buildSimpleNodeInternal('added', key, newValue, depth)}\n${buildSimpleNodeInternal('deleted', key, oldValue, depth)}`;
+  return `${formatSimpleNodeInternal('added', key, newValue, depth)}\n${formatSimpleNodeInternal('deleted', key, oldValue, depth)}`;
 };
 
-const buildSimpleNode = (node, depth) => {
+const formatSimpleNode = (node, depth) => {
   const {
     key,
     value = '',
     diffOp,
   } = node;
-  return `${buildSimpleNodeInternal(diffOp, key, value, depth)}`;
+  return `${formatSimpleNodeInternal(diffOp, key, value, depth)}`;
 };
 
 const nodeRenders = [
@@ -67,7 +67,7 @@ const nodeRenders = [
         key,
         diffOp,
       } = node;
-      return `\n${buildNodeFirstPart(diffOp, key, depth)}{${line}\n  ${getIndent(depth)}}`;
+      return `\n${formatNodeFirstPart(diffOp, key, depth)}{${line}\n  ${getIndent(depth)}}`;
     },
   },
   {
@@ -81,7 +81,7 @@ const nodeRenders = [
         value = '',
         diffOp,
       } = node;
-      return `\n${buildNodeFirstPart(diffOp, key, depth)}{\n${getIndent(depth + 1)}${stringify(value)}\n  ${getIndent(depth)}}${line}`;
+      return `\n${formatNodeFirstPart(diffOp, key, depth)}{\n${getIndent(depth + 1)}${stringify(value)}\n  ${getIndent(depth)}}${line}`;
     },
   },
   {
@@ -89,23 +89,23 @@ const nodeRenders = [
       const { diffOp = '' } = node;
       return diffOp === 'changed';
     },
-    nodeRender: (node, depth, line) => `\n${buildChangedNode(node, depth)}${line}`,
+    nodeRender: (node, depth, line) => `\n${formatChangedNode(node, depth)}${line}`,
   },
   {
     check: () => true,
-    nodeRender: (node, depth, line) => `\n${buildSimpleNode(node, depth)}${line}`,
+    nodeRender: (node, depth, line) => `\n${formatSimpleNode(node, depth)}${line}`,
   },
 ];
 
 const getNodeRender = node => nodeRenders.find(({ check }) => check(node));
 
-const getRenderData = () => ({
+const formatterData = {
   startElement: '{',
   endElement: '}',
-  render(depth, node, line) {
+  format(depth, node, line) {
     const { nodeRender } = getNodeRender(node);
     return `${nodeRender(node, depth, line)}`;
   },
-});
+};
 
-addRender(prefix, render(getRenderData));
+addFormatterData(prefix, formatterData);
