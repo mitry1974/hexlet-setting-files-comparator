@@ -1,17 +1,20 @@
 import fs from 'fs';
 import path from 'path';
-import { getParser } from './parsesrs/parsers';
-import './parsesrs/json';
-import './parsesrs/yaml';
-import './parsesrs/ini';
+import { getParser } from './parsers/parser';
+import './parsers/json';
+import './parsers/yaml';
+import './parsers/ini';
+import './renders/simple';
+import { getRender } from './renders/render';
 
-export default (filePath1, filePath2) => {
+export default (filePath1, filePath2, renderPrefix) => {
   const prefix = path.extname(filePath1);
   const parser = getParser(prefix);
 
   const dataBefore = fs.readFileSync(filePath1, 'utf8');
   const dataAfter = fs.readFileSync(filePath2, 'utf8');
   const finalArray = parser(dataBefore, dataAfter);
-
-  return `{\n${finalArray.join('\n')}\n}`;
+  const render = getRender(renderPrefix);
+  const rendered = render(finalArray);
+  return rendered;
 };

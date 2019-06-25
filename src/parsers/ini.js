@@ -1,6 +1,5 @@
 import ini from 'ini';
-import { addParser } from './parsers';
-import parseObjects from './utils';
+import { addParser, parseObjects } from './parser';
 
 const prefix = '.ini';
 
