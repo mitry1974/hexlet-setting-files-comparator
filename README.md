@@ -7,3 +7,4 @@ Hexler backend project level 2, JavaScript, made by Trushtalevskiy Dmitry
 <p>Asciinema for step 2 - https://asciinema.org/a/2XWDJCu13Bag7bimNYBnX1TfL</p>
 <p>Asciinema for step 3 - https://asciinema.org/a/Qko2E0l8bjxVN7ijrsl3QGOtk</p>
 <p>Asciinema for step 4 - https://asciinema.org/a/PFVUHmJe3YJj1mLgbPe1sWgVt</p>
+<p>Asciinema for step 5 - https://asciinema.org/a/0g51q27VkoRU0xLdj1xd28LMT</p>
