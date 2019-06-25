@@ -15,6 +15,5 @@ export default (filePath1, filePath2, renderPrefix) => {
   const dataAfter = fs.readFileSync(filePath2, 'utf8');
   const finalArray = parser(dataBefore, dataAfter);
   const render = getRender(renderPrefix);
-  const rendered = render(finalArray);
-  return rendered;
+  return render(finalArray);
 };
