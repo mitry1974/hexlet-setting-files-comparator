@@ -57,11 +57,11 @@ const getDiffLines = (object1, object2) => {
   }, []);
 };
 
-const parseObjects = parse => (dataBefore, dataAfter) => {
-  const objectBefore = parse(dataBefore, 'utf-8');
-  const objectAfter = parse(dataAfter, 'utf-8');
+export default (dataBefore, dataAfter, prefix) => {
+  const objectBefore = getParser(prefix)(dataBefore, 'utf-8');
+  const objectAfter = getParser(prefix)(dataAfter, 'utf-8');
 
   return getDiffLines(objectBefore, objectAfter);
 };
 
-export { addParser, getParser, parseObjects };
+export { addParser, getParser };

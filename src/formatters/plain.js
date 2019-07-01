@@ -19,31 +19,17 @@ const valueFormats = [
 
 const stringify = value => valueFormats.find(({ check }) => check(value)).formatValue(value);
 
-const operationTemplates = [
-  {
-    check: arg => arg === 'group',
-    template: (node, path) => iter(node.children, `${path}${node.key}.`),
-  },
-  {
-    check: arg => arg === 'added',
-    template: (node, path) => `Property '${path}${node.key}' was added with value: ${stringify(node.value)}`,
-  },
-  {
-    check: arg => arg === 'deleted',
-    template: (node, path) => `Property '${path}${node.key}' was removed`,
-  },
-  {
-    check: arg => arg === 'changed',
-    template: (node, path) => `Property '${path}${node.key}' was updated. From '${node.oldValue}' to '${node.newValue}'`,
-  },
-];
-
-const getOperationTemplate = operation => operationTemplates.find(({ check }) => check(operation));
+const operationTemplates = {
+  // eslint-disable-next-line no-use-before-define
+  group: (node, path) => iter(node.children, `${path}${node.key}.`),
+  added: (node, path) => `Property '${path}${node.key}' was added with value: ${stringify(node.value)}`,
+  deleted: (node, path) => `Property '${path}${node.key}' was removed`,
+  changed: (node, path) => `Property '${path}${node.key}' was updated. From '${node.oldValue}' to '${node.newValue}'`,
+};
 
 const iter = (data, path) => data.filter(node => node.diffOp !== 'unchanged')
-  .map(node => getOperationTemplate(node.diffOp).template(node, path));
+  .map(node => operationTemplates[node.diffOp](node, path));
 
 const format = parcedData => `${_.flattenDeep(iter(parcedData, '')).join('\n')}`;
-
 
 addFormatter(prefix, format);

@@ -1,5 +1,5 @@
-import { addParser, parseObjects } from '.';
+import { addParser } from '.';
 
 const prefix = '.json';
 
-addParser(prefix, parseObjects(JSON.parse));
+addParser(prefix, JSON.parse);

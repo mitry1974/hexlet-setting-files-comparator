@@ -1,6 +1,6 @@
 import yaml from 'js-yaml';
-import { addParser, parseObjects } from '.';
+import { addParser } from '.';
 
 const prefix = '.yml';
 
-addParser(prefix, parseObjects(yaml.safeLoad));
+addParser(prefix, yaml.safeLoad);
