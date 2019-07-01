@@ -42,6 +42,7 @@ const formatFirstPart = (diffOp, depth) => `${getIndent(depth)}${getNodeSign(dif
 const nodeFormatters = [
   {
     check: arg => arg === 'group',
+    // eslint-disable-next-line no-use-before-define
     formatNode: (node, depth) => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
   },
   {
