@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import program from 'commander';
 import { version, description } from '../../package.json';
-import generateDifference from '../engine';
+import generateDifference from '..';
 
 program
   .version(version, '-V, --version')

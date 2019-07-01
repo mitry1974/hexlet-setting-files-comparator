@@ -1,87 +1,49 @@
-import { addFormatterData } from '../render/render';
+import _ from 'lodash';
+import { addFormatter } from '.';
 
 const prefix = 'plain';
+const valueFormats = [
+  {
+    check: value => _.isBoolean(value) === true,
+    formatValue: _.identity,
+  },
+  {
+    check: value => _.isString(value) === true,
+    formatValue: value => `'${value}'`,
+  },
+  {
+    check: value => _.isObject(value) === true,
+    formatValue: () => '[complex value]',
+  },
+];
 
-const nodeSigns = [
+const stringify = value => valueFormats.find(({ check }) => check(value)).formatValue(value);
+
+const operationTemplates = [
+  {
+    check: arg => arg === 'group',
+    template: (node, path) => iter(node.children, `${path}${node.key}.`),
+  },
   {
     check: arg => arg === 'added',
-    sign: 'added with value:',
+    template: (node, path) => `Property '${path}${node.key}' was added with value: ${stringify(node.value)}`,
   },
   {
     check: arg => arg === 'deleted',
-    sign: 'removed',
+    template: (node, path) => `Property '${path}${node.key}' was removed`,
   },
   {
-    check: arg => arg === 'unchanged',
-    sign: ' ',
-  },
-  {
-    check: () => true,
-    sign: ' ',
+    check: arg => arg === 'changed',
+    template: (node, path) => `Property '${path}${node.key}' was updated. From '${node.oldValue}' to '${node.newValue}'`,
   },
 ];
 
-const nodeFormatters = [
-  {
-    check: (node) => {
-      const { nodeType = '' } = node;
-      return nodeType === 'group';
-    },
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-      } = node;
-      return `${key}: group`;
-    },
-  },
-  {
-    check: (node) => {
-      const { value = '' } = node;
-      return typeof value === 'object';
-    },
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-        value = '',
-      } = node;
-      return `${key}: ${value}${line} - object`;
-    },
-  },
-  {
-    check: (node) => {
-      const { diffOp = '' } = node;
-      return diffOp === 'changed';
-    },
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-        value = '',
-      } = node;
-      return `${key}: ${value}${line} - changed`;
-    },
-  },
-  {
-    check: () => true,
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-        value = '',
-      } = node;
-      return `${key}: ${value}${line} - changed`;
-    },
-  },
+const getOperationTemplate = operation => operationTemplates.find(({ check }) => check(operation));
 
-];
+const iter = (data, path) => data.filter(node => node.diffOp !== 'unchanged')
+  .map(node => getOperationTemplate(node.diffOp).template(node, path));
 
-const getNodeFormatter = node => ({ check }) => nodeFormatters.find(check(node));
+const format = parcedData => `${_.flattenDeep(iter(parcedData, '')).join('\n')}`;
 
-const formatterData = {
-  startElement: '{',
-  endElement: '}',
-  format(depth, node, line) {
-    const { nodeFormatter } = getNodeFormatter(node);
-    return `${nodeFormatter(node, depth, line)}`;
-  },
-};
 
-addFormatterData(prefix, formatterData);
+addFormatter(prefix, format);

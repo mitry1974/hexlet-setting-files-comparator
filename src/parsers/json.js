@@ -1,4 +1,4 @@
-import { addParser, parseObjects } from './parser';
+import { addParser, parseObjects } from '.';
 
 const prefix = '.json';
 

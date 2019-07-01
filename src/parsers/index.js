@@ -12,7 +12,7 @@ const diffOperations = [
   {
     check: (arg1, arg2) => _.isObject(arg1) && _.isObject(arg2),
     // eslint-disable-next-line no-use-before-define
-    getOperation: (key, object1, object2) => [({ nodeType: 'group', key, children: getDiffLines(object1, object2) })],
+    getOperation: (key, object1, object2) => [({ diffOp: 'group', key, children: getDiffLines(object1, object2) })],
   },
   {
     check: (arg1, arg2) => arg1 === arg2 && typeof arg1 === typeof arg2,

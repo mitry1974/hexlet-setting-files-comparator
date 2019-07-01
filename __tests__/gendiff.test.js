@@ -1,6 +1,6 @@
 import path from 'path';
 import fs from 'fs';
-import genDiff from '../src/engine';
+import genDiff from '../src';
 
 const plainFileResult = path.resolve(__dirname, './__fixtures__/plainFormatterResult.txt');
 const simpleFileResult = path.resolve(__dirname, './__fixtures__/simpleFormatterResult.txt');

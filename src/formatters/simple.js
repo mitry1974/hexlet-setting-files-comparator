@@ -1,111 +1,67 @@
-import { addFormatterData, stringify } from '../render/render';
+import _ from 'lodash';
+import { addFormatter } from '.';
 
 const prefix = 'simple';
+
 const indentationStep = '  ';
 
-const nodeSigns = [
-  {
-    check: arg => arg === 'added',
-    sign: '+',
-  },
-  {
-    check: arg => arg === 'deleted',
-    sign: '-',
-  },
-  {
-    check: arg => arg === 'unchanged',
-    sign: ' ',
-  },
-  {
-    check: () => true,
-    sign: ' ',
-  },
-];
+const nodeSigns = {
+  added: '+ ',
+  deleted: '- ',
+  unchanged: '  ',
+  group: '  ',
+};
 
-const getNodeSign = arg => nodeSigns.find(({ check }) => check(arg));
+const getNodeSign = type => nodeSigns[type] || ' ';
 
 const getIndent = depth => indentationStep.repeat(2 * (depth) - 1);
 
-const formatNodeFirstPart = (diffOp, key, depth) => {
-  const { sign } = getNodeSign(diffOp);
-  return `${getIndent(depth)}${sign} ${key}: `;
-};
-
-const formatSimpleNodeInternal = (diffOp, key, value, depth) => (
-  value.lenght === 0
-    ? ''
-    : `${formatNodeFirstPart(diffOp, key, depth)}${stringify(value)}`
-);
-
-const formatChangedNode = (node, depth) => {
-  const {
-    key,
-    oldValue = '',
-    newValue = '',
-  } = node;
-
-  return `${formatSimpleNodeInternal('added', key, newValue, depth)}\n${formatSimpleNodeInternal('deleted', key, oldValue, depth)}`;
-};
-
-const formatSimpleNode = (node, depth) => {
-  const {
-    key,
-    value = '',
-    diffOp,
-  } = node;
-  return `${formatSimpleNodeInternal(diffOp, key, value, depth)}`;
-};
-
-const nodeRenders = [
+const valueActions = [
   {
-    check: (node) => {
-      const { nodeType = '' } = node;
-      return nodeType === 'group';
-    },
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-        diffOp,
-      } = node;
-      return `\n${formatNodeFirstPart(diffOp, key, depth)}{${line}\n  ${getIndent(depth)}}`;
-    },
+    check: arg => typeof arg === 'boolean',
+    process: (nodeKey, obj) => `${nodeKey}: ${obj.toString()}`,
   },
   {
-    check: (node) => {
-      const { value = '' } = node;
-      return typeof value === 'object';
-    },
-    nodeRender: (node, depth, line) => {
-      const {
-        key,
-        value = '',
-        diffOp,
-      } = node;
-      return `\n${formatNodeFirstPart(diffOp, key, depth)}{\n${getIndent(depth + 1)}${stringify(value)}\n  ${getIndent(depth)}}${line}`;
-    },
+    check: arg => typeof arg === 'string',
+    process: (nodeKey, obj) => `${nodeKey}: ${obj}`,
   },
   {
-    check: (node) => {
-      const { diffOp = '' } = node;
-      return diffOp === 'changed';
+    check: arg => arg instanceof Object,
+    process: (nodeKey, obj, depth) => {
+      const reduced = Object.keys(obj).reduce((acc, key) => `  ${acc}${key}: ${obj[key]}`, '');
+      return `${nodeKey}: {\n${getIndent(depth + 1)}${reduced}\n${getIndent(depth)}  }`;
     },
-    nodeRender: (node, depth, line) => `\n${formatChangedNode(node, depth)}${line}`,
-  },
-  {
-    check: () => true,
-    nodeRender: (node, depth, line) => `\n${formatSimpleNode(node, depth)}${line}`,
   },
 ];
 
-const getNodeRender = node => nodeRenders.find(({ check }) => check(node));
+const getValueAction = arg => valueActions.find(({ check }) => check(arg));
 
-const formatterData = {
-  startElement: '{',
-  endElement: '}',
-  format(depth, node, line) {
-    const { nodeRender } = getNodeRender(node);
-    return `${nodeRender(node, depth, line)}`;
+const stringify = (nodeKey, value = '', depth) => getValueAction(value).process(nodeKey, value, depth);
+
+const formatFirstPart = (diffOp, depth) => `${getIndent(depth)}${getNodeSign(diffOp)}`;
+const nodeFormatters = [
+  {
+    check: arg => arg === 'group',
+    formatNode: (node, depth) => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
   },
-};
+  {
+    check: arg => arg === 'changed',
+    formatNode: (node, depth) => [
+      `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
+      `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
+    ].join('\n'),
+  },
+  {
+    check: () => true,
+    formatNode: (node, depth) => `${formatFirstPart(node.diffOp, depth)}${stringify(node.key, node.value, depth)}`,
+  },
+];
 
-addFormatterData(prefix, formatterData);
+const getNodeFormatter = operation => nodeFormatters.find(({ check }) => check(operation));
+
+const iter = (data, depth) => data.map(node => getNodeFormatter(node.diffOp)
+  .formatNode(node, depth));
+
+const format = parcedData => `{\n${_.flattenDeep(iter(parcedData, 1)).join('\n')}\n}`;
+
+addFormatter(prefix, format);
