@@ -6,6 +6,7 @@ import './parsers/yaml';
 import './parsers/ini';
 import './formatters/simple';
 import './formatters/plain';
+import './formatters/json';
 import format from './formatters';
 
 export default (filePath1, filePath2, formatterPrefix) => {

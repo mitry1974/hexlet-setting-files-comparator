@@ -4,8 +4,10 @@ import genDiff from '../src';
 
 const plainFileResult = path.resolve(__dirname, './__fixtures__/plainFormatterResult.txt');
 const simpleFileResult = path.resolve(__dirname, './__fixtures__/simpleFormatterResult.txt');
+const jsonFileResult = path.resolve(__dirname, './__fixtures__/jsonFormatterResult.txt');
 const simpleFormatterResultText = fs.readFileSync(simpleFileResult, 'utf8');
 const plainFormatterResultText = fs.readFileSync(plainFileResult, 'utf8');
+const jsonFormatterResultText = fs.readFileSync(jsonFileResult, 'utf8');
 
 const testFixtures = [
   [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'simple', simpleFormatterResultText],
@@ -14,6 +16,9 @@ const testFixtures = [
   [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'plain', plainFormatterResultText],
   [path.resolve(__dirname, './__fixtures__/before.yml'), path.resolve(__dirname, './__fixtures__/after.yml'), 'plain', plainFormatterResultText],
   [path.resolve(__dirname, './__fixtures__/before.ini'), path.resolve(__dirname, './__fixtures__/after.ini'), 'plain', plainFormatterResultText],
+  [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'json', jsonFormatterResultText],
+  [path.resolve(__dirname, './__fixtures__/before.yml'), path.resolve(__dirname, './__fixtures__/after.yml'), 'json', jsonFormatterResultText],
+  [path.resolve(__dirname, './__fixtures__/before.ini'), path.resolve(__dirname, './__fixtures__/after.ini'), 'json', jsonFormatterResultText],
 ];
 
 
