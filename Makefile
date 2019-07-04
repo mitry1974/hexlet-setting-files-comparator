@@ -11,5 +11,8 @@ lint:
 run help:
 	npx babel-node src/bin/gendiff.js -h
 
+test:
+	npx jest
+
 run version:
 	npx babel-node src/bin/gendiff.js -V
