@@ -6,10 +6,10 @@ publish:
 	npm publish --dry-run
 
 lint:
-	eslint .
+	npx eslint .
 
 run help:
-	npx npx babel-node src/bin/gendiff.js -h
+	npx babel-node src/bin/gendiff.js -h
 
 run version:
 	npx babel-node src/bin/gendiff.js -V
