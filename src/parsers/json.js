@@ -1,5 +1,1 @@
-import { addParser } from '.';
-
-const prefix = '.json';
-
-addParser(prefix, JSON.parse);
+export default JSON.parse;

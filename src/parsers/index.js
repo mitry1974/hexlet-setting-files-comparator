@@ -1,9 +1,12 @@
 import _ from 'lodash';
+import parseJson from './json';
+import parseIni from './ini';
+import parseYml from './yaml';
 
-const parsers = {};
-
-const addParser = (prefix, parser) => {
-  parsers[prefix] = parser;
+const parsers = {
+  '.json': parseJson,
+  '.yml': parseYml,
+  '.ini': parseIni,
 };
 
 const getParser = prefix => parsers[prefix];
@@ -63,5 +66,3 @@ export default (dataBefore, dataAfter, prefix) => {
 
   return getDiffLines(objectBefore, objectAfter);
 };
-
-export { addParser, getParser };

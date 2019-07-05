@@ -1,7 +1,4 @@
 import _ from 'lodash';
-import { addFormatter } from '.';
-
-const prefix = 'simple';
 
 const indentationStep = '  ';
 
@@ -63,6 +60,4 @@ const getNodeFormatter = operation => nodeFormatters.find(({ check }) => check(o
 const iter = (data, depth) => data.map(node => getNodeFormatter(node.diffOp)
   .formatNode(node, depth));
 
-const format = parcedData => `{\n${_.flattenDeep(iter(parcedData, 1)).join('\n')}\n}`;
-
-addFormatter(prefix, format);
+export default parcedData => `{\n${_.flattenDeep(iter(parcedData, 1)).join('\n')}\n}`;

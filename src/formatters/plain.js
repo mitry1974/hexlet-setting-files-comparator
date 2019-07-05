@@ -1,7 +1,5 @@
 import _ from 'lodash';
-import { addFormatter } from '.';
 
-const prefix = 'plain';
 const valueFormats = [
   {
     check: value => _.isBoolean(value) === true,
@@ -30,6 +28,4 @@ const operationTemplates = {
 const iter = (data, path) => data.filter(node => node.diffOp !== 'unchanged')
   .map(node => operationTemplates[node.diffOp](node, path));
 
-const format = parcedData => `${_.flattenDeep(iter(parcedData, '')).join('\n')}`;
-
-addFormatter(prefix, format);
+export default parcedData => `${_.flattenDeep(iter(parcedData, '')).join('\n')}`;

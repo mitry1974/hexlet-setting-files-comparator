@@ -2,24 +2,27 @@ import path from 'path';
 import fs from 'fs';
 import genDiff from '../src';
 
-const plainFileResult = path.resolve(__dirname, './__fixtures__/plainFormatterResult.txt');
-const simpleFileResult = path.resolve(__dirname, './__fixtures__/simpleFormatterResult.txt');
-const jsonFileResult = path.resolve(__dirname, './__fixtures__/jsonFormatterResult.txt');
-const simpleFormatterResultText = fs.readFileSync(simpleFileResult, 'utf8');
-const plainFormatterResultText = fs.readFileSync(plainFileResult, 'utf8');
-const jsonFormatterResultText = fs.readFileSync(jsonFileResult, 'utf8');
+const pathResolve = fileName => path.resolve(__dirname, fileName);
 
-const testFixtures = [
-  [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'simple', simpleFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.yml'), path.resolve(__dirname, './__fixtures__/after.yml'), 'simple', simpleFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.ini'), path.resolve(__dirname, './__fixtures__/after.ini'), 'simple', simpleFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'plain', plainFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.yml'), path.resolve(__dirname, './__fixtures__/after.yml'), 'plain', plainFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.ini'), path.resolve(__dirname, './__fixtures__/after.ini'), 'plain', plainFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.json'), path.resolve(__dirname, './__fixtures__/after.json'), 'json', jsonFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.yml'), path.resolve(__dirname, './__fixtures__/after.yml'), 'json', jsonFormatterResultText],
-  [path.resolve(__dirname, './__fixtures__/before.ini'), path.resolve(__dirname, './__fixtures__/after.ini'), 'json', jsonFormatterResultText],
-];
+const getFixtures = () => {
+  const formatStyles = [
+    ['simple', './__fixtures__/simpleFormatterResult.txt'],
+    ['plain', './__fixtures__/plainFormatterResult.txt'],
+    ['json', './__fixtures__/jsonFormatterResult.txt'],
+  ];
 
+  const fixturesFileNames = [
+    ['./__fixtures__/before.json', './__fixtures__/after.json'],
+    ['./__fixtures__/before.yml', './__fixtures__/after.yml'],
+    ['./__fixtures__/before.ini', './__fixtures__/after.ini'],
+  ];
 
-test.each(testFixtures)('comparing %s, %s', (a, b, c, expected) => expect(genDiff(a, b, c)).toEqual(expected));
+  return fixturesFileNames.reduce((acc, fName) => [...acc, ...formatStyles.map(style => [
+    pathResolve(fName[0]),
+    pathResolve(fName[1]),
+    style[0],
+    fs.readFileSync(pathResolve(style[1]), 'utf8'),
+  ])], []);
+};
+
+test.each(getFixtures())('comparing %s, %s', (a, b, c, expected) => expect(genDiff(a, b, c)).toEqual(expected));

@@ -1,10 +1,11 @@
-const formatters = {};
+import formatSimple from './simple';
+import formatPlain from './plain';
+import formatJson from './json';
 
-const addFormatter = (prefix, format) => {
-  formatters[prefix] = format;
+const formatters = {
+  simple: formatSimple,
+  plain: formatPlain,
+  json: formatJson,
 };
 
-const format = (data, prefix) => formatters[prefix](data);
-
-export { addFormatter };
-export default format;
+export default (data, prefix) => formatters[prefix](data);

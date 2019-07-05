@@ -8,7 +8,7 @@ publish:
 lint:
 	npx eslint .
 
-run help:
+help:
 	npx babel-node src/bin/gendiff.js -h
 
 test:
