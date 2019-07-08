@@ -8,11 +8,10 @@ const parsers = {
   '.ini': ini.parse,
 };
 
-const getParser = prefix => parsers[prefix];
-
 export default (dataBefore, dataAfter, prefix) => {
-  const objectBefore = getParser(prefix)(dataBefore, 'utf-8');
-  const objectAfter = getParser(prefix)(dataAfter, 'utf-8');
+  const parse = parsers[prefix];
+  const objectBefore = parse(dataBefore, 'utf-8');
+  const objectAfter = parse(dataAfter, 'utf-8');
 
   return generateAST(objectBefore, objectAfter);
 };
