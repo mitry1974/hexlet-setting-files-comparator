@@ -4,7 +4,7 @@ const diffOperations = [
   {
     check: (arg1, arg2) => _.isObject(arg1) && _.isObject(arg2),
     // eslint-disable-next-line no-use-before-define
-    getOperation: (key, object1, object2) => [({ diffOp: 'group', key, children: generateAST(object1, object2) })],
+    getOperation: (key, object1, object2) => [({ diffOp: 'group', key, children: generateAst(object1, object2) })],
   },
   {
     check: (arg1, arg2) => arg1 === arg2 && typeof arg1 === typeof arg2,
@@ -41,7 +41,7 @@ const getDiffOperation = (arg1, arg2) => diffOperations.find(({ check }) => chec
 
 const unionKeys = (object1, object2) => _.union(_.keys(object1), _.keys(object2));
 
-const generateAST = (object1, object2) => {
+const generateAst = (object1, object2) => {
   const keys = unionKeys(object1, object2);
   return keys.reduce((acc, key) => {
     const { getOperation } = getDiffOperation(object1[key], object2[key]);
@@ -49,4 +49,4 @@ const generateAST = (object1, object2) => {
   }, []);
 };
 
-export default generateAST;
+export default generateAst;
