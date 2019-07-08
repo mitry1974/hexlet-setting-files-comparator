@@ -2,11 +2,11 @@ import path from 'path';
 import fs from 'fs';
 import genDiff from '../src';
 
-const fixturesPath = './__fixtures__';
+const fixturesPath = './__fixtures__/';
 const formatStyles = ['simple', 'plain', 'json'];
 const fixturesFileExts = ['json', 'yml', 'ini'];
 
-const pathResolve = fileName => path.resolve(__dirname, `${fixturesPath}/${fileName}`);
+const pathResolve = fileName => path.resolve(__dirname, `${fixturesPath}${fileName}`);
 
 const getFixtures = () => fixturesFileExts.reduce(
   (acc, ext) => [...acc, ...formatStyles.map(style => [

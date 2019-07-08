@@ -1,12 +1,6 @@
 import fs from 'fs';
 import path from 'path';
 import parse from './parsers';
-import './parsers/json';
-import './parsers/yaml';
-import './parsers/ini';
-import './formatters/simple';
-import './formatters/plain';
-import './formatters/json';
 import format from './formatters';
 
 export default (filePath1, filePath2, formatterPrefix) => {
