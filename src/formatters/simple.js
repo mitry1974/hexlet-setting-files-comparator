@@ -13,51 +13,33 @@ const getNodeSign = type => nodeSigns[type] || ' ';
 
 const getIndent = depth => indentationStep.repeat(2 * (depth) - 1);
 
-const valueActions = [
-  {
-    check: arg => typeof arg === 'boolean',
-    process: (nodeKey, obj) => `${nodeKey}: ${obj.toString()}`,
+const valueActions = {
+  boolean: (nodeKey, obj) => `${nodeKey}: ${obj.toString()}`,
+  string: (nodeKey, obj) => `${nodeKey}: ${obj}`,
+  object: (nodeKey, obj, depth) => {
+    const reduced = Object.keys(obj).reduce((acc, key) => `  ${acc}${key}: ${obj[key]}`, '');
+    return `${nodeKey}: {\n${getIndent(depth + 1)}${reduced}\n${getIndent(depth)}  }`;
   },
-  {
-    check: arg => typeof arg === 'string',
-    process: (nodeKey, obj) => `${nodeKey}: ${obj}`,
-  },
-  {
-    check: arg => arg instanceof Object,
-    process: (nodeKey, obj, depth) => {
-      const reduced = Object.keys(obj).reduce((acc, key) => `  ${acc}${key}: ${obj[key]}`, '');
-      return `${nodeKey}: {\n${getIndent(depth + 1)}${reduced}\n${getIndent(depth)}  }`;
-    },
-  },
-];
+};
 
-const getValueAction = arg => valueActions.find(({ check }) => check(arg));
-
-const stringify = (nodeKey, value = '', depth) => getValueAction(value).process(nodeKey, value, depth);
+const stringify = (nodeKey, value = '', depth) => valueActions[typeof value](nodeKey, value, depth);
 
 const formatFirstPart = (diffOp, depth) => `${getIndent(depth)}${getNodeSign(diffOp)}`;
-const nodeFormatters = [
-  {
-    check: arg => arg === 'group',
-    // eslint-disable-next-line no-use-before-define
-    formatNode: (node, depth) => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
-  },
-  {
-    check: arg => arg === 'changed',
-    formatNode: (node, depth) => [
+const formatSimpleNode = (node, depth) => `${formatFirstPart(node.diffOp, depth)}${stringify(node.key, node.value, depth)}`;
+
+
+const iter = (data, depth) => data.map((node) => {
+  const nodeFormatters = {
+    group: () => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
+    changed: () => [
       `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
       `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
     ].join('\n'),
-  },
-  {
-    check: () => true,
-    formatNode: (node, depth) => `${formatFirstPart(node.diffOp, depth)}${stringify(node.key, node.value, depth)}`,
-  },
-];
+    unchanged: () => formatSimpleNode(node, depth),
+    added: () => formatSimpleNode(node, depth),
+    deleted: () => formatSimpleNode(node, depth),
+  };
+  return nodeFormatters[node.diffOp]();
+});
 
-const getNodeFormatter = operation => nodeFormatters.find(({ check }) => check(operation));
-
-const iter = (data, depth) => data.map(node => getNodeFormatter(node.diffOp)
-  .formatNode(node, depth));
-
-export default parcedData => `{\n${_.flattenDeep(iter(parcedData, 1)).join('\n')}\n}`;
+export default data => `{\n${_.flattenDeep(iter(data, 1)).join('\n')}\n}`;
