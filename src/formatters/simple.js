@@ -32,8 +32,8 @@ const iter = (data, depth) => data.map((node) => {
   const nodeFormatters = {
     group: () => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
     changed: () => [
-      `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
       `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
+      `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
     ].join('\n'),
     unchanged: () => formatSimpleNode(node, depth),
     added: () => formatSimpleNode(node, depth),
