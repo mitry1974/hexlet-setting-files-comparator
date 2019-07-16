@@ -10,7 +10,6 @@ const nodeSigns = {
 };
 
 const getNodeSign = type => nodeSigns[type] || ' ';
-
 const getIndent = depth => indentationStep.repeat(2 * (depth) - 1);
 
 const valueActions = {
@@ -23,14 +22,12 @@ const valueActions = {
 };
 
 const stringify = (nodeKey, value = '', depth) => valueActions[typeof value](nodeKey, value, depth);
-
-const formatFirstPart = (diffOp, depth) => `${getIndent(depth)}${getNodeSign(diffOp)}`;
-const formatSimpleNode = (node, depth) => `${formatFirstPart(node.diffOp, depth)}${stringify(node.key, node.value, depth)}`;
-
+const formatFirstPart = (nodeType, depth) => `${getIndent(depth)}${getNodeSign(nodeType)}`;
+const formatSimpleNode = (node, depth) => `${formatFirstPart(node.type, depth)}${stringify(node.key, node.value, depth)}`;
 
 const iter = (data, depth) => data.map((node) => {
   const nodeFormatters = {
-    group: () => `${formatFirstPart(node.diffOp, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
+    group: () => `${formatFirstPart(node.type, depth)}${node.key}: {\n${iter(node.children, depth + 1).join('\n')}\n${getIndent(depth)}  }`,
     changed: () => [
       `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
       `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
@@ -39,7 +36,7 @@ const iter = (data, depth) => data.map((node) => {
     added: () => formatSimpleNode(node, depth),
     deleted: () => formatSimpleNode(node, depth),
   };
-  return nodeFormatters[node.diffOp]();
+  return nodeFormatters[node.type]();
 });
 
 export default data => `{\n${_.flattenDeep(iter(data, 1)).join('\n')}\n}`;

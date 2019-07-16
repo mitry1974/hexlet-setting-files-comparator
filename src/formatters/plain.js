@@ -15,8 +15,8 @@ const iter = (data, path) => {
     changed: node => `Property '${path}${node.key}' was updated. From '${node.oldValue}' to '${node.newValue}'`,
   };
 
-  return data.filter(node => node.diffOp !== 'unchanged')
-    .map(node => operationTemplates[node.diffOp](node));
+  return data.filter(node => node.type !== 'unchanged')
+    .map(node => operationTemplates[node.type](node));
 };
 
 export default data => `${_.flattenDeep(iter(data, '')).join('\n')}`;

@@ -1,0 +1,16 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "nodeDbg",
+      "name": "gendiff.test.js",
+      "project": "__tests__\\gendiff.test.js"
+    },
+    {
+      "type": "nodeDbg",
+      "name": "gendiff.test.js(1)",
+      "project": "__tests__\\gendiff.test.js"
+    }
+  ]
+}
