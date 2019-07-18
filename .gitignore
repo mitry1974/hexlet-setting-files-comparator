@@ -5,3 +5,4 @@ dist
 .tern-port
 launch.json
 .idea
+.vs

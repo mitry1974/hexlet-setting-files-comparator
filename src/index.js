@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import fs from 'fs';
-import path from 'path';
 import parse from './parser';
 import format from './formatters';
 
@@ -36,16 +35,21 @@ const unionKeys = (object1, object2) => _.union(_.keys(object1), _.keys(object2)
 
 const generateAst = (object1, object2) => {
   const keys = unionKeys(object1, object2);
-  return keys.reduce((acc, key) => {
+  return keys.map((key) => {
     const { generateNode } = getNodeGenerator(object1[key], object2[key]);
-    return [...acc, generateNode(key, object1[key], object2[key])];
+    return generateNode(key, object1[key], object2[key]);
   }, []);
 };
 
+const getParsedConfig = (filepath) => {
+  const parserType = filepath.substring(filepath.indexOf('.') + 1);
+  const data = fs.readFileSync(filepath, 'utf8');
+  return parse(data, parserType);
+};
+
 export default (filePath1, filePath2, formatterType) => {
-  const parserType = path.extname(filePath1);
-  const dataBefore = fs.readFileSync(filePath1, 'utf8');
-  const dataAfter = fs.readFileSync(filePath2, 'utf8');
-  const ast = generateAst(parse(dataBefore, parserType), parse(dataAfter, parserType));
+  const config1 = getParsedConfig(filePath1);
+  const config2 = getParsedConfig(filePath2);
+  const ast = generateAst(config1, config2);
   return format(ast, formatterType);
 };

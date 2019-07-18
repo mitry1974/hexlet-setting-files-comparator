@@ -7,16 +7,16 @@ const valueFormats = {
 };
 const stringify = value => valueFormats[typeof value](value);
 
-const iter = (data, path) => {
+const format = (data, path = '') => {
   const operationTemplates = {
-    group: node => iter(node.children, `${path}${node.key}.`),
+    group: node => format(node.children, `${path}${node.key}.`),
     added: node => `Property '${path}${node.key}' was added with value: ${stringify(node.value)}`,
     deleted: node => `Property '${path}${node.key}' was removed`,
     changed: node => `Property '${path}${node.key}' was updated. From '${node.oldValue}' to '${node.newValue}'`,
   };
 
   return data.filter(node => node.type !== 'unchanged')
-    .map(node => operationTemplates[node.type](node));
+    .map(node => operationTemplates[node.type](node)).join('\n');
 };
 
-export default data => `${_.flattenDeep(iter(data, '')).join('\n')}`;
+export default format;
