@@ -30,9 +30,12 @@ const formatInternal = (data, depth = 1) => data.map((node) => {
       `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
       `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
     ],
+    added: formatSimpleNode,
+    deleted: formatSimpleNode,
+    unchanged: formatSimpleNode,
   };
 
-  const nodeFormatter = nodeFormatters[node.type] || formatSimpleNode;
+  const nodeFormatter = nodeFormatters[node.type];
   return nodeFormatter(node, depth);
 });
 
