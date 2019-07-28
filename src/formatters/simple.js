@@ -10,18 +10,16 @@ const operations = {
 const getOperation = type => operations[type] || '  ';
 const getIndent = depth => indentationStep.repeat(2 * (depth) - 1);
 
-const valueActions = {
-  boolean: (nodeKey, obj) => `${nodeKey}: ${obj.toString()}`,
-  string: (nodeKey, obj) => `${nodeKey}: ${obj}`,
-  object: (nodeKey, obj, depth) => {
-    const objectAsLine = Object.keys(obj).reduce((acc, key) => `  ${acc}${key}: ${obj[key]}`, '');
-    return [`${nodeKey}: {`, `${getIndent(depth + 1)}${objectAsLine}`, `${getIndent(depth)}  }`].join('\n');
-  },
+const stringify = (nodeKey, value = '', depth) => {
+  if (_.isString(value) || _.isBoolean(value)) {
+    return `${nodeKey}: ${value}`;
+  }
+  const objectAsLine = Object.keys(value).reduce((acc, key) => `  ${acc}${key}: ${value[key]}`, '');
+  return [`${nodeKey}: {`, `${getIndent(depth + 1)}${objectAsLine}`, `${getIndent(depth)}  }`].join('\n');
 };
 
-const stringify = (nodeKey, value = '', depth) => valueActions[typeof value](nodeKey, value, depth);
+
 const formatFirstPart = (nodeType, depth) => `${getIndent(depth)}${getOperation(nodeType)}`;
-const formatSimpleNode = (node, depth) => `${formatFirstPart(node.type, depth)}${stringify(node.key, node.value, depth)}`;
 
 const formatInternal = (data, depth = 1) => data.map((node) => {
   const nodeFormatters = {
@@ -30,9 +28,12 @@ const formatInternal = (data, depth = 1) => data.map((node) => {
       `${formatFirstPart('deleted', depth)}${stringify(node.key, node.oldValue, depth)}`,
       `${formatFirstPart('added', depth)}${stringify(node.key, node.newValue, depth)}`,
     ],
+    added: () => `${formatFirstPart(node.type, depth)}${stringify(node.key, node.value, depth)}`,
+    deleted: () => `${formatFirstPart(node.type, depth)}${stringify(node.key, node.value, depth)}`,
+    unchanged: () => `${formatFirstPart(node.type, depth)}${stringify(node.key, node.value, depth)}`,
   };
 
-  const nodeFormatter = nodeFormatters[node.type] || formatSimpleNode;
+  const nodeFormatter = nodeFormatters[node.type];
   return nodeFormatter(node, depth);
 });
 
