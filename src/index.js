@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import fs from 'fs';
+import path from 'path';
 import parse from './parser';
 import format from './formatters';
 
@@ -42,7 +43,7 @@ const generateAst = (object1, object2) => {
 };
 
 const getParsedConfig = (filepath) => {
-  const parserType = filepath.substring(filepath.indexOf('.') + 1);
+  const parserType = path.extname(filepath).substring(1);
   const data = fs.readFileSync(filepath, 'utf8');
   return parse(data, parserType);
 };
